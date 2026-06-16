@@ -27,6 +27,15 @@ config/*.bak.*
 .DS_Store
 .env
 .env.*
+git.txt
 
 # 可选：本地虚拟串口测试产物（如有）
 # /dev/ttyVUSB*
+
+# C/C++ 构建产物（若后续有原生扩展）
+*.o
+*.so
+*.dll
+*.exe
+CMakeCache.txt
+CMakeFiles/

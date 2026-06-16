@@ -149,9 +149,13 @@ class SystemConfigPage(ConfigPageBase):
             page_lay.setContentsMargins(0, 0, 0, 0)
             page_lay.setSpacing(10)
             page_lay.addWidget(section_title("串口与运动参数"))
-            fields = ["id", "slave_id", "port", "home_position"]
-            fields += [f for f in ("max_speed", "press_position", "insert_position", "tighten_steps") if f in cfg]
-            grid = build_field_grid(cfg, fields, self.mark_dirty, columns=4, text_fields={"port"})
+            fields = ["id", "slave_id", "port", "home_position", "pulses_per_ms", "max_speed"]
+            fields += [f for f in ("press_position", "insert_position", "tighten_steps") if f in cfg]
+            grid = build_field_grid(
+                cfg, fields, self.mark_dirty, columns=4,
+                text_fields={"port"},
+                float_fields={"pulses_per_ms"},
+            )
             page_lay.addWidget(grid)
             # 单电机雷赛覆盖项 → steppers.<name>.leadshine
             ls_cfg = cfg.setdefault("leadshine", {})

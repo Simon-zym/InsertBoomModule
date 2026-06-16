@@ -44,7 +44,8 @@ class MockStepperMotor(StepperMotorBase):
         with self._lock:
             self._moving = True
         distance = abs(target - self._position)
-        delay = min(0.05 + distance / max(speed, 1) * 0.001, 2.0)
+        delay = self.estimate_motion_seconds(distance, speed)
+        delay = min(max(delay, 0.05), 2.0)
         time.sleep(delay)
         with self._lock:
             self._position = target

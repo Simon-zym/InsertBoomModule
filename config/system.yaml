@@ -49,6 +49,7 @@ hardware:
       level_trigger: 0
 
   # 5 路步进 — 每路独立串口；slave_id 为 Modbus 从站地址
+  # pulses_per_ms: 脉冲当量，在 max_speed 流程速度下每毫秒输出的脉冲数
   steppers:
     stepper_1:            # 图标1 - 绕线器
       id: 1
@@ -56,6 +57,7 @@ hardware:
       port: /dev/ttyVUSB0
       home_position: 0
       max_speed: 1000
+      pulses_per_ms: 50.0
       leadshine:
         velocity: 300           # 覆盖全局默认速度 (rpm)
     stepper_2:            # 图标5 - 压线机构
@@ -63,6 +65,8 @@ hardware:
       slave_id: 2
       port: /dev/ttyVUSB2
       home_position: 0
+      max_speed: 1000
+      pulses_per_ms: 50.0
       press_position: 5000
       leadshine:
         velocity: 300           # 覆盖全局默认速度 (rpm)
@@ -71,6 +75,8 @@ hardware:
       slave_id: 3
       port: /dev/ttyVUSB4
       home_position: 0
+      max_speed: 1000
+      pulses_per_ms: 40.0
       press_position: 3000
       leadshine:
         velocity: 300           # 覆盖全局默认速度 (rpm)
@@ -79,6 +85,8 @@ hardware:
       slave_id: 4
       port: /dev/ttyVUSB6
       home_position: 0
+      max_speed: 1000
+      pulses_per_ms: 35.0
       insert_position: 8000
       leadshine:
         velocity: 300           # 覆盖全局默认速度 (rpm)
@@ -87,6 +95,8 @@ hardware:
       slave_id: 5
       port: /dev/ttyVUSB8
       home_position: 0
+      max_speed: 1000
+      pulses_per_ms: 45.0
       tighten_steps: 2000
       leadshine:
         velocity: 300           # 覆盖全局默认速度 (rpm)

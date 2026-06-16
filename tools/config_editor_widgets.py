@@ -219,11 +219,13 @@ def build_field_grid(
     columns: int = 4,
     text_fields: Optional[Set[str]] = None,
     int_fields: Optional[Set[str]] = None,
+    float_fields: Optional[Set[str]] = None,
 ) -> FieldGrid:
     from config_labels_zh import field_label
 
     text_fields = text_fields or set()
     int_fields = int_fields or {"id", "baudrate", "max_speed", "slave_id"}
+    float_fields = float_fields or set()
     grid = FieldGrid(columns)
 
     def _set(key: str, value: Any) -> None:
@@ -239,6 +241,11 @@ def build_field_grid(
             grid.add_field(label, edit)
         elif isinstance(value, bool):
             grid.add_checkbox_field(label, "启用", bool(value), lambda v, k=key: _set(k, v))
+        elif key in float_fields or (isinstance(value, float) and key not in int_fields):
+            spin = number_widget(value if value is not None else 0, False)
+            spin.setDecimals(4)
+            spin.valueChanged.connect(lambda _v, k=key, s=spin: _set(k, spin_value(s)))
+            grid.add_field(label, spin)
         elif isinstance(value, int) or key in int_fields:
             spin = number_widget(value, True)
             spin.valueChanged.connect(lambda _v, k=key, s=spin: _set(k, spin_value(s)))

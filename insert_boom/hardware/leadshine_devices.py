@@ -9,6 +9,8 @@
 hardware.leadshine_defaults   全局默认
 hardware.steppers.<name>.leadshine   单电机覆盖
 hardware.steppers.<name>.slave_id    Modbus 从站地址
+hardware.steppers.<name>.pulses_per_ms  脉冲当量 (pulse/ms，在 max_speed 下)
+hardware.steppers.<name>.max_speed      流程速度上限，与 workflow 中 speed 对应
 
 装配流程中的 stepper_1~5 通过 HardwareManager.get_stepper() 调用，
 无需步骤代码感知 Modbus 细节。
@@ -184,11 +186,12 @@ class LeadShineStepperMotor(StepperMotorBase):
         return ok
 
     def move_to_position(self, position: int, speed: int, timeout: float = 30.0) -> bool:
-        """绝对位置运动，position 单位 pulse"""
+        """绝对位置运动，position 单位 pulse；speed 经脉冲当量换算为 rpm"""
         if not self._motor:
             return False
         self._moving = True
-        self._motor.set_motor_absolute_position_mode(position, velocity=speed or self.default_velocity)
+        rpm = self.speed_to_rpm(speed) if speed else self.default_velocity
+        self._motor.set_motor_absolute_position_mode(position, velocity=rpm)
         return self._wait_done(timeout)
 
     def move_relative(self, steps: int, speed: int, timeout: float = 30.0) -> bool:
@@ -196,7 +199,8 @@ class LeadShineStepperMotor(StepperMotorBase):
         if not self._motor:
             return False
         self._moving = True
-        self._motor.set_motor_relative_position_mode(steps, velocity=speed or self.default_velocity)
+        rpm = self.speed_to_rpm(speed) if speed else self.default_velocity
+        self._motor.set_motor_relative_position_mode(steps, velocity=rpm)
         return self._wait_done(timeout)
 
     def move_to_home(self, speed: int, timeout: float = 30.0) -> bool:

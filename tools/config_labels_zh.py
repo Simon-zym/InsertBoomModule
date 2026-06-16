@@ -14,6 +14,7 @@ FIELD_LABELS: dict[str, str] = {
     "slave_id": "Modbus 从站地址",
     "port": "串口路径",
     "home_position": "回零位置",
+    "pulses_per_ms": "脉冲当量(pulse/ms)",
     "max_speed": "最大速度",
     "press_position": "压线位置",
     "insert_position": "插入位置",

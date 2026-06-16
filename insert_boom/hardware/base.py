@@ -26,6 +26,45 @@ class StepperMotorBase(ABC):
     def __init__(self, name: str, motor_id: int):
         self.name = name
         self.motor_id = motor_id
+        # 脉冲当量：在 max_speed 流程速度下，每毫秒输出的脉冲数 (pulse/ms)
+        self.pulses_per_ms: float = 10.0
+        self.max_speed: int = 1000
+        self.pulses_per_round: int = 10000
+
+    def configure_motion(
+        self,
+        pulses_per_ms: float,
+        max_speed: int = 1000,
+        pulses_per_round: int = 10000,
+    ) -> None:
+        """从 system.yaml 加载运动标定参数"""
+        self.pulses_per_ms = max(float(pulses_per_ms), 0.001)
+        self.max_speed = max(int(max_speed), 1)
+        self.pulses_per_round = max(int(pulses_per_round), 1)
+
+    def effective_pulse_rate(self, speed: int) -> float:
+        """
+        将流程中的 speed 参数换算为实际脉冲率 (pulse/ms)。
+
+        speed 与 max_speed 同量纲；在 max_speed 时输出 pulses_per_ms。
+        """
+        return self.pulses_per_ms * (max(int(speed), 0) / self.max_speed)
+
+    def estimate_motion_seconds(self, pulse_distance: int, speed: int) -> float:
+        """根据脉冲当量估算运动时间 (秒)"""
+        rate_pps = self.effective_pulse_rate(speed) * 1000.0
+        if rate_pps <= 0:
+            return 0.0
+        return abs(pulse_distance) / rate_pps
+
+    def speed_to_rpm(self, speed: int) -> int:
+        """雷赛驱动器：流程 speed → 转速 rpm"""
+        rate_pps = self.effective_pulse_rate(speed) * 1000.0
+        return max(1, int(rate_pps * 60.0 / self.pulses_per_round))
+
+    def speed_to_device_units(self, speed: int) -> int:
+        """RS485 文本协议等设备：流程 speed → 脉冲率 (pulse/s)"""
+        return max(1, int(self.effective_pulse_rate(speed) * 1000.0))
 
     @abstractmethod
     def connect(self) -> bool:

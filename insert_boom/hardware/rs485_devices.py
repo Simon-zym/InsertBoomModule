@@ -68,7 +68,8 @@ class RS485StepperMotor(StepperMotorBase):
 
     def move_to_position(self, position: int, speed: int, timeout: float = 30.0) -> bool:
         self._moving = True
-        ok = self._send(f"MOVE_ABS:{position},{speed}")
+        device_speed = self.speed_to_device_units(speed)
+        ok = self._send(f"MOVE_ABS:{position},{device_speed}")
         if ok:
             self._position = position
         self._moving = False
@@ -76,7 +77,8 @@ class RS485StepperMotor(StepperMotorBase):
 
     def move_relative(self, steps: int, speed: int, timeout: float = 30.0) -> bool:
         self._moving = True
-        ok = self._send(f"MOVE_REL:{steps},{speed}")
+        device_speed = self.speed_to_device_units(speed)
+        ok = self._send(f"MOVE_REL:{steps},{device_speed}")
         if ok:
             self._position += steps
         self._moving = False
@@ -84,7 +86,8 @@ class RS485StepperMotor(StepperMotorBase):
 
     def move_to_home(self, speed: int, timeout: float = 30.0) -> bool:
         self._moving = True
-        ok = self._send(f"HOME:{speed}")
+        device_speed = self.speed_to_device_units(speed)
+        ok = self._send(f"HOME:{device_speed}")
         if ok:
             self._position = self.home_position
         self._moving = False

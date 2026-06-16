@@ -275,6 +275,11 @@ class LeadShineDebugPanel(QWidget):
                 delay_read_write=delay,
                 leadshine_cfg=ls,
             )
+            motor.configure_motion(
+                pulses_per_ms=float(cfg.get("pulses_per_ms", 10.0)),
+                max_speed=int(cfg.get("max_speed", 1000)),
+                pulses_per_round=int(ls.get("pulses_per_round", 10000)),
+            )
             if not motor.connect():
                 QMessageBox.critical(self, "连接失败", f"无法连接 {STEPPER_LABELS.get(key, key)}")
                 return

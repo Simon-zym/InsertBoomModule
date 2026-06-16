@@ -157,6 +157,21 @@ class HardwareManager:
             ),
         }
 
+    def _stepper_motion_config(self, hw_cfg: dict, cfg: dict) -> dict:
+        """步进脉冲当量等运动标定（每电机可独立配置）"""
+        ls = hw_cfg.get("leadshine_defaults", {})
+        return {
+            "pulses_per_ms": float(cfg.get("pulses_per_ms", 10.0)),
+            "max_speed": int(cfg.get("max_speed", 1000)),
+            "pulses_per_round": int(
+                cfg.get("leadshine", {}).get("pulses_per_round", ls.get("pulses_per_round", 10000))
+            ),
+        }
+
+    def _apply_stepper_motion(self, motor: StepperMotorBase, hw_cfg: dict, cfg: dict) -> None:
+        motion = self._stepper_motion_config(hw_cfg, cfg)
+        motor.configure_motion(**motion)
+
     def _build_mock_devices(self, hw_cfg: dict) -> None:
         """Mock 模式: 创建模拟设备，日志里标注对应串口"""
         logger.info("创建 Mock 硬件设备...")
@@ -164,6 +179,7 @@ class HardwareManager:
             port = cfg.get("port", "N/A")
             motor = MockStepperMotor(key, int(cfg.get("id", 0)), int(cfg.get("home_position", 0)))
             motor.port = port  # type: ignore[attr-defined]
+            self._apply_stepper_motion(motor, hw_cfg, cfg)
             self.steppers[key] = motor
             logger.debug("  Mock %s [%s] → 串口 %s", STEPPER_LABELS.get(key, key), key, port)
 
@@ -211,6 +227,7 @@ class HardwareManager:
                 delay_read_write=float(motor_ls.get("delay_read_write", 0.05)),
                 leadshine_cfg=motor_ls,
             )
+            self._apply_stepper_motion(self.steppers[key], hw_cfg, cfg)
             logger.info(
                 "  LeadShine %s → %s @ %d slave=%s",
                 STEPPER_LABELS.get(key, key),
@@ -255,6 +272,7 @@ class HardwareManager:
                 timeout=params["timeout"],
                 motion_timeout=params["motion_timeout"],
             )
+            self._apply_stepper_motion(self.steppers[key], hw_cfg, cfg)
             logger.info("  RS485 %s → %s @ %d",
                           STEPPER_LABELS.get(key, key), port, params["baudrate"])
 
