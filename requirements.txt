@@ -1,0 +1,7 @@
+pyyaml>=6.0
+pyserial>=3.5
+PyQt5>=5.15
+modbus-tk>=1.1.3
+
+# 真实机械臂模式需要安装睿尔曼 SDK（可选）
+# Robotic_Arm

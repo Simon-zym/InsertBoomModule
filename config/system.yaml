@@ -1,0 +1,128 @@
+# ============================================================================
+# InsertBoom 系统硬件配置
+# mode: mock = 模拟 | rs485 = 文本协议 RS485 | leadshine = 雷赛 Modbus 步进
+# ============================================================================
+
+hardware:
+  mode: leadshine   # mock | rs485 | leadshine
+
+  # RS485 / Modbus 串口默认参数（每路设备可单独覆盖）
+  serial_defaults:
+    baudrate: 115200
+    timeout: 0.5
+    motion_timeout: 30.0
+    delay_read_write: 0.05
+
+  # 雷赛步进全局默认 — 各 stepper.leadshine 节可覆盖同名项
+  # DI/DO 地址存十进制，括号内为十六进制协议地址
+  leadshine_defaults:
+    mode: CLOSE_LOOP
+    acceleration: 50
+    deceleration: 50
+    pulses_per_round: 10000
+    encoder_resolution: 4000
+    peak_current: 10
+    velocity: 300
+    enable_on_connect: false   # 连接时写 0x000F 使能
+    auto_home_on_init: false    # 连接时自动回零并设零（调试时可关）
+    di_neg_limit: 327   # 0x0147 DI2 反向限位
+    di_neg_limit_type: 38   # 0x26
+    di_pos_limit: 329   # 0x0149 DI3 正向限位
+    di_pos_limit_type: 37   # 0x25
+    do1: 343              # 0x0157
+    do1_type: 5
+    do2: 345              # 0x0159
+    do2_type: 5
+    do3: 347              # 0x015B
+    do3_type: 5
+    home_parameter:
+      direction: 0
+      move_to_position: 0
+      home_mode: 0
+      single_z: 0
+      current_as_home: 0
+      with_z_signal: 0
+    pr_parameter:
+      ctrg: 0
+      software_limit: 0
+      power_on_home: 0
+      level_trigger: 0
+
+  # 5 路步进 — 每路独立串口；slave_id 为 Modbus 从站地址
+  steppers:
+    stepper_1:            # 图标1 - 绕线器
+      id: 1
+      slave_id: 1
+      port: /dev/ttyVUSB0
+      home_position: 0
+      max_speed: 1000
+      leadshine:
+        velocity: 300           # 覆盖全局默认速度 (rpm)
+    stepper_2:            # 图标5 - 压线机构
+      id: 2
+      slave_id: 2
+      port: /dev/ttyVUSB2
+      home_position: 0
+      press_position: 5000
+      leadshine:
+        velocity: 300           # 覆盖全局默认速度 (rpm)
+    stepper_3:            # 图标2 - 刀片
+      id: 3
+      slave_id: 3
+      port: /dev/ttyVUSB4
+      home_position: 0
+      press_position: 3000
+      leadshine:
+        velocity: 300           # 覆盖全局默认速度 (rpm)
+    stepper_4:            # 图标3 - 雷管插入
+      id: 4
+      slave_id: 4
+      port: /dev/ttyVUSB6
+      home_position: 0
+      insert_position: 8000
+      leadshine:
+        velocity: 300           # 覆盖全局默认速度 (rpm)
+    stepper_5:            # 图标4 - 引线收紧
+      id: 5
+      slave_id: 5
+      port: /dev/ttyVUSB8
+      home_position: 0
+      tighten_steps: 2000
+      leadshine:
+        velocity: 300           # 覆盖全局默认速度 (rpm)
+
+  # 2 路电缸 — 各占 1 个 RS485 串口
+  cylinders:
+    cylinder_1:
+      port: /dev/ttyVUSB10
+      extend_timeout: 5.0
+      retract_timeout: 5.0
+    cylinder_2:
+      port: /dev/ttyVUSB12
+      extend_timeout: 3.0
+      retract_timeout: 3.0
+
+  sensors:
+    winder_home:          # 绕线器初始位：False=未遮挡=初始, True=遮挡=需回零
+      initial_value: false
+    press_wire_ready:
+      initial_value: true
+
+  grippers:
+    left:
+      open_position: 1000
+      close_explosive: 200
+      close_product: 250
+    right:
+      open_position: 1000
+      close_detonator: 150
+
+robots:
+  left_arm:
+    ip: 172.16.0.89       # 左臂固定 IP
+    port: 8080
+    config_file: config/waypoints_left.yaml
+  right_arm:
+    ip: 172.16.0.88       # 右臂固定 IP
+    port: 8080
+    config_file: config/waypoints_right.yaml

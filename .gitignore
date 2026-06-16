@@ -1,0 +1,32 @@
+# Python
+__pycache__/
+*.py[cod]
+*.egg-info/
+.eggs/
+dist/
+build/
+*.egg
+.venv/
+venv/
+env/
+
+# IDE
+.idea/
+.vscode/
+*.swp
+*~
+
+# 日志与运行时
+hd_ware_tool/logfiles/
+*.log
+
+# 配置编辑器自动备份
+config/*.bak.*
+
+# 系统/本地
+.DS_Store
+.env
+.env.*
+
+# 可选：本地虚拟串口测试产物（如有）
+# /dev/ttyVUSB*

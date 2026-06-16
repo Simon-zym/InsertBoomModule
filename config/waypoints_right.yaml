@@ -1,0 +1,74 @@
+# ============================================================================
+# 右机械臂途径点（172.16.0.88）
+# 单位: 位置 m, 欧拉角 rad, speed 0-100
+#
+# 流程拆分:
+#   process_pick_and_place_detonator — 取雷管 + 经压线/绕线口 + 入雷管槽
+#   process_return_home              — 放雷管后回归初始位置2
+# ============================================================================
+
+home_2:
+  position: { x: 0.0, y: -0.30, z: 0.40 }
+  euler: { roll: 3.141, pitch: 0.0, yaw: 0.0 }
+  speed: 20
+
+# ---- 取雷管 + 入槽（不含回初始）----
+process_pick_and_place_detonator:
+  name: pick_and_place_detonator
+  description: "取雷管，引线经压线位和绕线器开口，放入雷管槽"
+  waypoints:
+    - name: approach_detonator
+      position: { x: 0.35, y: -0.40, z: 0.25 }
+      euler: { roll: 3.141, pitch: 0.0, yaw: 0.0 }
+      speed: 15
+      gripper_action: none
+
+    - name: detonator_pick
+      position: { x: 0.40, y: -0.42, z: 0.15 }
+      euler: { roll: 3.141, pitch: 0.0, yaw: 0.0 }
+      speed: 10
+      gripper_action: close_detonator
+
+    - name: lift_detonator
+      position: { x: 0.40, y: -0.42, z: 0.28 }
+      euler: { roll: 3.141, pitch: 0.0, yaw: 0.0 }
+      speed: 15
+
+    - name: press_wire_pass
+      position: { x: 0.25, y: -0.25, z: 0.22 }
+      euler: { roll: 3.141, pitch: -0.15, yaw: 0.0 }
+      speed: 12
+      trajectory_connect: 1
+
+    - name: winder_opening
+      position: { x: 0.15, y: -0.10, z: 0.20 }
+      euler: { roll: 3.141, pitch: -0.10, yaw: 0.0 }
+      speed: 12
+      trajectory_connect: 1
+
+    - name: slot_approach
+      position: { x: 0.08, y: 0.05, z: 0.22 }
+      euler: { roll: 3.141, pitch: 0.0, yaw: 0.0 }
+      speed: 12
+      trajectory_connect: 1
+
+    - name: detonator_slot_place
+      position: { x: 0.08, y: 0.05, z: 0.16 }
+      euler: { roll: 3.141, pitch: 0.0, yaw: 0.0 }
+      speed: 8
+      gripper_action: open
+
+    - name: retreat_from_slot
+      position: { x: 0.08, y: 0.05, z: 0.30 }
+      euler: { roll: 3.141, pitch: 0.0, yaw: 0.0 }
+      speed: 15
+
+# ---- 放雷管后回初始位置2 ----
+process_return_home:
+  name: return_home
+  description: "放雷管后回归初始位置2"
+  waypoints:
+    - name: return_home_2
+      position: { x: 0.0, y: -0.30, z: 0.40 }
+      euler: { roll: 3.141, pitch: 0.0, yaw: 0.0 }
+      speed: 20

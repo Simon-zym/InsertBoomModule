@@ -1,0 +1,56 @@
+# ============================================================================
+# InsertBoom 装配流程参数
+# ============================================================================
+
+workflow:
+  name: insert_boom_assembly
+  max_retries: 2
+  retry_delay_sec: 1.0
+  step_timeout: 120.0
+  auto_rollback: false
+
+  steps:
+    step_01_winder_home:
+      speed: 500
+      sensor_timeout: 10.0
+
+    step_03_cylinder1_retract:
+      timeout: 5.0
+
+    step_05_cylinder1_extend:
+      timeout: 5.0
+
+    step_06_press_wire:
+      speed: 300
+      position: 5000
+      sensor_timeout: 5.0
+      ready_sensor: press_wire_ready
+
+    step_07_blade_press:
+      speed: 200
+      position: 3000
+      hold_time: 0.5
+      timeout: 5.0
+
+    step_08_insert_detonator:
+      speed: 200
+      position: 8000
+      timeout: 10.0
+
+    step_09_tighten_lead:
+      speed: 400
+      steps: 2000
+      timeout: 10.0
+
+    step_10_wrap_film:
+      speed: 300
+      wrap_steps: 10000
+      timeout: 60.0
+
+    step_11_cut_film:
+      timeout: 3.0
+      cut_hold_time: 1.0
+
+    step_12_press_wire_home:
+      speed: 300
+      timeout: 10.0
